@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<link rel="stylesheet" href="css.css">
+
+<head>
+    <title>רשימת דיירים לפי כתובת</title>
+</head>
+<body>
+<h1>רשימת כתובות</h1>
+
+<div class="main">
+    <a href="https://lawpgisot.netlify.app/" class="button">קביעת תור</a>
+</div>
+<ul id="address-list">
+    <li>טוען כתובות...</li>
+</ul>
+
+<div id="residents-by-address">
+    <h2>דיירים בכתובת: <span id="selected-address"></span></h2>
+    <table id="residents-table">
+        <thead>
+        <tr>
+            <th>פעולות</th>
+            <th>סטטוס</th>
+            <th>טלפון</th>
+            <th>שם</th>
+            <th>קומה</th>
+            <th>כתובת</th>
+            <th>ID</th>
+        </tr>
+        </thead>
+        <tbody id="residents-by-address-tbody">
+        <tr><td colspan="7">טוען דיירים...</td></tr>
+        </tbody>
+    </table>
+    <button onclick="showAddressList()">חזרה לרשימת כתובות</button>
+</div>
+
+<script src="script.js"></script>
+<script>
+    let allResidents = []; // שמירת כל הדיירים לאחר הטעינה הראשונית
+
+    async function fetchAddresses() {
+        const addressList = document.getElementById('address-list');
+        addressList.innerHTML = '<li>טוען כתובות...</li>';
+
+        try {
+            const response = await fetch('/residents');
+            const residents = await response.json();
+            allResidents = residents; // שומרים את כל הדיירים
+
+            const uniqueAddresses = [...new Set(residents.map(r => r.address))];
+            addressList.innerHTML = '';
+            uniqueAddresses.forEach(address => {
+                const listItem = document.createElement('li');
+                const link = document.createElement('a');
+                link.href = '#';
+                link.textContent = address;
+                link.onclick = () => showResidentsByAddress(address);
+                listItem.appendChild(link);
+                addressList.appendChild(listItem);
+            });
+        } catch (error) {
+            console.error('שגיאה בטעינת הכתובות:', error);
+            addressList.innerHTML = '<li>שגיאה בטעינת הכתובות.</li>';
+        }
+    }
+
+    function showResidentsByAddress(address) {
+        document.getElementById('address-list').style.display = 'none';
+        const residentsByAddressDiv = document.getElementById('residents-by-address');
+        residentsByAddressDiv.style.display = 'block';
+        document.getElementById('selected-address').textContent = address;
+
+        const residentsInAddress = allResidents.filter(r => r.address === address);
+        const tableBody = document.getElementById('residents-by-address-tbody');
+        tableBody.innerHTML = '';
+
+        if (residentsInAddress.length === 0) {
+            tableBody.innerHTML = '<tr><td colspan="7">אין דיירים בכתובת זו.</td></tr>';
+            return;
+        }
+
+        residentsInAddress.forEach(resident => {
+            const row = tableBody.insertRow();
+            row.insertCell().innerHTML = `
+                    <select id="status-${resident.id}">
+                        <option value="טרם טופל"${resident.status === 'טרם טופל' ? ' selected' : ''}>טרם טופל</option>
+                        <option value="חתם"${resident.status === 'חתם' ? ' selected' : ''}>חתם</option>
+                        <option value="לא חתם"${resident.status === 'לא חתם' ? ' selected' : ''}>לא חתם</option>
+                        <option value="לא ענה לטלפון"${resident.status === 'לא ענה לטלפון' ? ' selected' : ''}>לא ענה לטלפון</option>
+                        <option value="סרבן"${resident.status === 'סרבן' ? ' selected' : ''}>סרבן</option>
+                    </select>
+                    <button onclick="updateStatus(${resident.id})">עדכן</button>
+                `;
+            row.insertCell().textContent = resident.status;
+            row.insertCell().textContent = resident.phone;
+            row.insertCell().textContent = resident.owner_name;
+            row.insertCell().textContent = resident.floor;
+            row.insertCell().textContent = resident.address;
+            row.insertCell().textContent = resident.id;
+        });
+    }
+
+    function showAddressList() {
+        document.getElementById('address-list').style.display = 'block';
+        document.getElementById('residents-by-address').style.display = 'none';
+    }
+
+    // טעינת רשימת הכתובות בעת טעינת הדף
+    window.onload = fetchAddresses;
+</script>
+</body>
+</html>

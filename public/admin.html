@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>פאנל ניהול</title>
+    <link rel="stylesheet" href="css.css">
+
+</head>
+<body>
+<h1>פאנל ניהול</h1>
+
+<div id="upload-section">
+    <h2>העלאת קובץ JSON</h2>
+    <input type="file" id="jsonFile" accept=".json">
+    <button onclick="uploadJson()">העלה</button>
+    <div id="upload-message"></div>
+</div>
+
+<div id="status-counts-section">
+    <h2>סטטיסטיקות סטטוס</h2>
+    <div id="status-counts">טוען סטטיסטיקות...</div>
+</div>
+
+<div id="actions-section">
+    <h2>פעולות ניהול</h2>
+    <button onclick="deleteAllData()">מחק את כל הנתונים</button>
+</div>
+
+<div id="pdf-download-section">
+    <h2>הורדת דירות לפי סטטוס (PDF)</h2>
+    <label for="status-select">בחר סטטוס:</label>
+    <select id="status-select">
+        <option value="חתם">חתם</option>
+        <option value="לא חתם">לא חתם</option>
+        <option value="לא ענה לטלפון">לא ענה לטלפון</option>
+        <option value="סרבן">סרבן</option>
+        <option value="טרם טופל">טרם טופל</option>
+        <option value="all">הכל</option>
+    </select>
+    <button onclick="downloadResidentsPdf()">הורד PDF</button>
+    <div id="pdf-message"></div>
+</div>
+
+<script src="admin.js"></script>
+</body>
+</html>
