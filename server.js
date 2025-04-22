@@ -3,8 +3,7 @@ const multer = require('multer');
 const database = require('./database');
 const pdfMake = require('pdfmake/build/pdfmake');
 const pdfFonts = require('pdfmake/build/vfs_fonts');
-console.log(pdfFonts); // הדפס את האובייקט כדי לראות מה הוא מכיל
-// אל תנסה לגשת ל-pdfFonts.pdfMake.vfs כרגע
+pdfMake.vfs = pdfFonts.pdfMake.vfs; // תקן את הגישה ל-vfs
 
 const app = express();
 const port = 3344;
@@ -72,7 +71,7 @@ app.get('/status-counts', async (req, res) => {
         res.json(counts);
     } catch (error) {
         console.error('שגיאה בשליפת ספירת סטטוסים:', error);
-        res.status(500).send('שגיאה בשליפת ספירת הסטטוסים.');
+        res.status(500).send('שגיאה בשליפת הסטטוסים.');
     }
 });
 
